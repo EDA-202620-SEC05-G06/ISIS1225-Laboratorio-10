@@ -30,7 +30,10 @@
 
 from DataStructures.List import single_linked_list as lt
 from DataStructures.Map import map_linear_probing as m
+from DataStructures.List import array_list as al
 from DataStructures.Graph import digraph as G
+from DataStructures.Graph import dfs as dfs
+from DataStructures.Stack import stack as st
 
 import csv
 import time
@@ -251,15 +254,44 @@ def get_most_concurrent_stops(analyzer):
     """
     Obtiene las 5 paradas más concurridas
     """
-    # TODO: Obtener las 5 paradas más concurridas, es decir, con más arcos salientes
-    ...
+    graph = analyzer['connections']
+    keys = G.vertices(graph)
+    top = []  # lista de python con a lo sumo 5 parejas (parada, grado)
+    for i in range(al.size(keys)):
+        key = al.get_element(keys, i)
+        deg = G.degree(graph, key)
+        if len(top) < 5 or deg > top[-1][1]:
+            pos = len(top)
+            while pos > 0 and top[pos - 1][1] < deg:
+                pos -= 1
+            top.insert(pos, (key, deg))
+            if len(top) > 5:
+                top.pop()
+
+    result = al.new_list()
+    for key, deg in top:
+        al.add_last(result, {'stop': key, 'connections': deg})
+    return result
+
 
 def get_route_between_stops_dfs(analyzer, stop1, stop2):
     """
-    Obtener la ruta entre dos parada usando dfs
+    Obtener la ruta entre dos parada usando dfs.
+
+    Retorna una lista (array_list) con las llaves de los vertices del camino
+    desde stop1 hasta stop2, o None si alguna parada no existe o no hay camino.
     """
-    # TODO: Obtener la ruta entre dos parada usando dfs
-    ...
+    graph = analyzer['connections']
+    if not G.contains_vertex(graph, stop1) or not G.contains_vertex(graph, stop2):
+        return None
+    visited = dfs.dfs(graph, stop1)
+    path_stack = dfs.path_to(stop2, visited)
+    if path_stack is None:
+        return None
+    route = al.new_list()
+    while not st.is_empty(path_stack):
+        al.add_last(route, st.pop(path_stack))
+    return route
 
 def get_route_between_stops_bfs(analyzer, stop1, stop2):
     """

@@ -104,3 +104,84 @@ def size(my_graph):
     :rtype: int
     """
     return my_graph["num_edges"]
+
+
+# ___________________________________________________
+#  Funciones semana 1 - casa
+# ___________________________________________________
+
+def _get_existing_vertex(my_graph, key_u):
+    """
+    Retorna el vertice ``key_u`` o lanza una excepcion si no existe.
+    """
+    vertex = mp.get(my_graph["vertices"], key_u)
+    if vertex is None:
+        raise Exception("El vertice no existe")
+    return vertex
+
+
+def degree(my_graph, key_u):
+    """
+    Retorna el numero de arcos salientes del vertice ``key_u``.
+
+    :raises Exception: Si el vertice no existe
+    """
+    vertex = _get_existing_vertex(my_graph, key_u)
+    return V.degree(vertex)
+
+
+def adjacents(my_graph, key_u):
+    """
+    Retorna una lista (array_list) con las llaves de los vertices
+    adyacentes a ``key_u``. Si no tiene adyacentes, la lista es vacia.
+
+    :raises Exception: Si el vertice no existe
+    """
+    vertex = _get_existing_vertex(my_graph, key_u)
+    return mp.key_set(V.get_adjacents(vertex))
+
+
+def vertices(my_graph):
+    """
+    Retorna una lista (array_list) con las llaves de todos los vertices.
+    """
+    return mp.key_set(my_graph["vertices"])
+
+
+def edges_vertex(my_graph, key_u):
+    """
+    Retorna una lista (array_list) con los arcos salientes de ``key_u``.
+    Si no tiene arcos, la lista es vacia.
+
+    :raises Exception: Si el vertice no existe
+    """
+    vertex = _get_existing_vertex(my_graph, key_u)
+    return mp.value_set(V.get_adjacents(vertex))
+
+
+def get_vertex(my_graph, key_u):
+    """
+    Retorna el vertice ``key_u`` o ``None`` si no existe.
+    """
+    return mp.get(my_graph["vertices"], key_u)
+
+
+def update_vertex_info(my_graph, key_u, new_info_u):
+    """
+    Cambia la informacion del vertice ``key_u`` por ``new_info_u``.
+    Si el vertice no existe, retorna el grafo sin cambios.
+    """
+    vertex = mp.get(my_graph["vertices"], key_u)
+    if vertex is not None:
+        V.set_value(vertex, new_info_u)
+    return my_graph
+
+
+def get_vertex_information(my_graph, key_u):
+    """
+    Retorna la informacion (value) del vertice ``key_u``.
+
+    :raises Exception: Si el vertice no existe
+    """
+    vertex = _get_existing_vertex(my_graph, key_u)
+    return V.get_value(vertex)

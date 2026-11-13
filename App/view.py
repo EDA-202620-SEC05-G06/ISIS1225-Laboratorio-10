@@ -28,6 +28,7 @@
 import sys
 import threading
 from App import logic
+from DataStructures.List import array_list as al
 
 """
 La vista se encarga de la interacción con el usuario.
@@ -74,12 +75,61 @@ def option_one(cont):
     print('El limite de recursion actual: ' + str(sys.getrecursionlimit()))
 
 def option_two(cont):
-    # TODO: Imprimir los resultados de la opción 2
-    ...
+    print("\n------ OPCIÓN 2 ------")
+    start = logic.get_time()
+    stops = logic.get_most_concurrent_stops(cont)
+    end = logic.get_time()
+    print("Las paradas más concurridas son:")
+    for i in range(al.size(stops)):
+        stop = al.get_element(stops, i)
+        print(str(i + 1) + ". '" + stop['stop'] + "': "
+              + str(stop['connections']) + " conexiones")
+    print("Tiempo de ejecución: " + str(round(logic.delta_time(end, start), 3)) + " ms")
+
 
 def option_three(cont):
-    # TODO: Imprimir los resultados de la opción 3
-    ...
+    print("\n----- OPCIÓN 3 (DFS) ----")
+    stop1 = input("Parada inicial: ").strip()
+    stop2 = input("Parada destino: ").strip()
+    start = logic.get_time()
+    route = logic.get_route_between_stops_dfs(cont, stop1, stop2)
+    end = logic.get_time()
+    print_route(route, stop1, stop2)
+    print("Tiempo de ejecución: " + str(round(logic.delta_time(end, start), 3)) + " ms")
+
+
+def print_route(route, stop1, stop2):
+    """
+    Imprime una ruta (lista de vertices <BusStopCode>-<ServiceNo>) agrupando
+    los tramos por bus e indicando los transbordos.
+    """
+    if route is None or al.size(route) == 0:
+        print("No existe una ruta entre '" + stop1 + "' y '" + stop2
+              + "' (o alguna de las paradas no existe).")
+        return
+
+    # Se agrupan los vertices en tramos: [servicio, [paradas]]
+    segments = []
+    for i in range(al.size(route)):
+        code, service = al.get_element(route, i).split('-', 1)
+        if not segments:
+            segments.append([service, [code]])
+        elif service == segments[-1][0]:
+            segments[-1][1].append(code)
+        elif len(segments[-1][1]) == 1 and segments[-1][1][0] == code:
+            # Transbordos seguidos en la misma parada: solo cuenta el ultimo bus
+            segments[-1][0] = service
+        else:
+            segments.append([service, [code]])
+
+    for i, (service, codes) in enumerate(segments):
+        if i == 0:
+            print("\n--- Tomar bus '" + service + "' desde '" + codes[0] + "-" + service + "' ---")
+        else:
+            print("--- Cambiar a bus '" + service + "' en la parada '" + codes[0] + "' ---")
+        print(" -> ".join(codes) + (" ->" if i < len(segments) - 1 else ""))
+    print("\nTotal de vértices en la ruta: " + str(al.size(route))
+          + " | Transbordos: " + str(len(segments) - 1))
 
 def option_four(cont):
     # TODO: Imprimir los resultados de la opción 4
