@@ -33,6 +33,8 @@ from DataStructures.Map import map_linear_probing as m
 from DataStructures.List import array_list as al
 from DataStructures.Graph import digraph as G
 from DataStructures.Graph import dfs as dfs
+from DataStructures.Graph import bfs as bfs
+from DataStructures.Graph import dijkstra as dijkstra
 from DataStructures.Stack import stack as st
 
 import csv
@@ -234,9 +236,6 @@ def add_same_stop_connections(analyzer, service):
     stop_1 = format_vertex(service)
     stop_buses_lt = m.get(analyzer['stops'], service['BusStopCode'])['services']
 
-    if lt.size(stop_buses_lt) > 1:
-        pass
-
     node = stop_buses_lt['first']
     for _ in range(lt.size(stop_buses_lt)):
         stop_2 = format_vertex({'BusStopCode': service['BusStopCode'], 'ServiceNo': node['info']})
@@ -286,28 +285,52 @@ def get_route_between_stops_dfs(analyzer, stop1, stop2):
         return None
     visited = dfs.dfs(graph, stop1)
     path_stack = dfs.path_to(stop2, visited)
-    if path_stack is None:
-        return None
-    route = al.new_list()
-    while not st.is_empty(path_stack):
-        al.add_last(route, st.pop(path_stack))
-    return route
+    return stack_to_list(path_stack)
+
 
 def get_route_between_stops_bfs(analyzer, stop1, stop2):
     """
-    Obtener la ruta entre dos parada usando bfs
+    Obtener la ruta entre dos parada usando bfs.
+
+    Retorna una lista (array_list) con las llaves de los vertices del camino
+    desde stop1 hasta stop2 (el de menos arcos), o None si alguna parada no
+    existe o no hay camino.
     """
-    # TODO: Obtener la ruta entre dos parada usando bfs
-    ...
+    graph = analyzer['connections']
+    if not G.contains_vertex(graph, stop1) or not G.contains_vertex(graph, stop2):
+        return None
+    visited = bfs.bfs(graph, stop1)
+    path_stack = bfs.path_to(stop2, visited)
+    return stack_to_list(path_stack)
+
 
 def get_shortest_route_between_stops(analyzer, stop1, stop2):
     """
-    Obtener la ruta mínima entre dos paradas
+    Obtener la ruta mínima (en distancia) entre dos paradas.
+
+    El resultado de Dijkstra se guarda en analyzer['paths'] para poder
+    reutilizarlo si se pide otra ruta desde la misma parada de origen.
+
+    Retorna un diccionario con:
+    - 'route': lista (array_list) con las llaves de los vertices del camino
+    - 'distance': distancia total del camino
+    o None si alguna parada no existe o no hay camino.
     """
-    # TODO: Obtener la ruta mínima entre dos paradas
-    # Nota: Tenga en cuenta que el debe guardar en la llave
-    #       analyzer['paths'] el resultado del algoritmo de Dijkstra
-    ...
+    graph = analyzer['connections']
+    if not G.contains_vertex(graph, stop1) or not G.contains_vertex(graph, stop2):
+        return None
+
+    # Solo se vuelve a correr Dijkstra si cambia la parada de origen
+    if analyzer['paths'] is None or analyzer['paths']['source'] != stop1:
+        analyzer['paths'] = dijkstra.dijkstra(graph, stop1)
+
+    path_stack = dijkstra.path_to(stop2, analyzer['paths'])
+    if path_stack is None:
+        return None
+    return {'route': stack_to_list(path_stack),
+            'distance': dijkstra.dist_to(stop2, analyzer['paths'])}
+
+
 
 def show_calculated_shortest_route(analyzer, destination_stop):
     # (Opcional) TODO: Mostrar en un mapa la ruta mínima entre dos paradas usando folium
@@ -319,6 +342,19 @@ def show_calculated_shortest_route(analyzer, destination_stop):
 # ___________________________________________________
 # Funciones Helper
 # ___________________________________________________
+
+def stack_to_list(path_stack):
+    """
+    Pasa la pila de un camino (origen en el tope) a una lista (array_list)
+    en orden origen -> destino. Si la pila es None retorna None.
+    """
+    if path_stack is None:
+        return None
+    route = al.new_list()
+    while not st.is_empty(path_stack):
+        al.add_last(route, st.pop(path_stack))
+    return route
+
 
 def clean_service_distance(lastservice, service):
     """

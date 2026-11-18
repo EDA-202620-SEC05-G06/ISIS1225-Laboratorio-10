@@ -132,12 +132,29 @@ def print_route(route, stop1, stop2):
           + " | Transbordos: " + str(len(segments) - 1))
 
 def option_four(cont):
-    # TODO: Imprimir los resultados de la opción 4
-    ...
+    print("\n----- OPCIÓN 4 (BFS) ----")
+    stop1 = input("Parada inicial: ").strip()
+    stop2 = input("Parada destino: ").strip()
+    start = logic.get_time()
+    route = logic.get_route_between_stops_bfs(cont, stop1, stop2)
+    end = logic.get_time()
+    print_route(route, stop1, stop2)
+    print("Tiempo de ejecución: " + str(round(logic.delta_time(end, start), 3)) + " ms")
+
 
 def option_five(cont):
-    # TODO: Imprimir los resultados de la opción 5
-    ...
+    print("\n----- OPCIÓN 5 (Dijkstra) ----")
+    stop1 = input("Parada inicial: ").strip()
+    stop2 = input("Parada destino: ").strip()
+    start = logic.get_time()
+    result = logic.get_shortest_route_between_stops(cont, stop1, stop2)
+    end = logic.get_time()
+    if result is None:
+        print_route(None, stop1, stop2)
+    else:
+        print_route(result['route'], stop1, stop2)
+        print("Distancia total: " + str(round(result['distance'], 3)) + " km")
+    print("Tiempo de ejecución: " + str(round(logic.delta_time(end, start), 3)) + " ms")
 
 def option_six(cont):
     # (Opcional) TODO: Imprimir los resultados de la opción 6

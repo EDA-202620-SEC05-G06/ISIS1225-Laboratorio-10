@@ -26,9 +26,9 @@ Este repositorio forma parte del marco docente de estructura de datos y algoritm
 
 Los estudiantes editan esta sección para agregar sus nombres, correos electrónicos de Uniandes y especificar qué funcionalidad de proyecto implementarán.
 
-1. Christian Bravo, ca.bravom1@uniandes.edu.co
-1. Nicolás Fajardo Aguirre, n.fajardoa@uniandes.edu.co
-1. Dennys Lozano, da.lozanom1@uniandes.edu.co
+1. Nicolás Fajardo Aguirre, 202413083, n.fajardoa@uniandes.edu.co
+1. Christian Bravo, 202322012, ca.bravom@uniandes.edu.co
+1. Dennys Lozano, 202413859, da.lozanom1@uniandes.edu.co
 
 [Volver al inicio](#laboratorio-10)
 
